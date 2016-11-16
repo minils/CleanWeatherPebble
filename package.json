@@ -1,0 +1,115 @@
+{
+    "author": "minils",
+    "dependencies": {},
+    "keywords": [],
+    "name": "clean-weather",
+    "pebble": {
+	"capabilities": ["location"],
+        "displayName": "Clean Weather",
+        "enableMultiJS": true,
+	"messageKeys": [
+            "TEMPERATURE",
+	    "ICON"
+        ],
+        "projectType": "native",
+        "resources": {
+            "media": [
+		{
+                    "file": "images/battery.png",
+                    "name": "IMAGE_BATTERY",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/weather/clear-day.png",
+                    "name": "IMAGE_WEATHER_CLEAR_DAY",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/clear-night.png",
+                    "name": "IMAGE_WEATHER_CLEAR_NIGHT",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/cloudy.png",
+                    "name": "IMAGE_WEATHER_CLOUDY",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/default.png",
+                    "name": "IMAGE_WEATHER_DEFAULT",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/fog.png",
+                    "name": "IMAGE_WEATHER_FOG",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/partly-cloudy-day.png",
+                    "name": "IMAGE_WEATHER_PARTLY_CLOUDY_DAY",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/partly-cloudy-night.png",
+                    "name": "IMAGE_WEATHER_PARTLY_CLOUDY_NIGHT",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/rain.png",
+                    "name": "IMAGE_WEATHER_RAIN",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/sleet.png",
+                    "name": "IMAGE_WEATHER_SLEET",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/snow.png",
+                    "name": "IMAGE_WEATHER_SNOW",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+		{
+                    "file": "images/weather/wind.png",
+                    "name": "IMAGE_WEATHER_WIND",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "characterRegex": "[a-zA-Z0-9. ]",
+                    "file": "fonts/Gameplay.ttf",
+                    "name": "FONT_GAMPLAY_20",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
+                    "characterRegex": "[0-9:]",
+                    "file": "fonts/Gameplay.ttf",
+                    "name": "FONT_GAMPLAY_34",
+                    "targetPlatforms": null,
+                    "type": "font"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite"
+        ],
+        "uuid": "16384b99-283e-41bd-bf6b-14c8027cc16c",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.0.0"
+}
