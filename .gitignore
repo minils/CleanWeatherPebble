@@ -34,3 +34,6 @@
 
 #pebble
 /build/*
+
+# emacs
+*.*~
