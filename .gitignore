@@ -34,6 +34,7 @@
 
 #pebble
 /build/*
+.lock-waf_linux2_build
 
 # emacs
 *.*~
