@@ -3,8 +3,10 @@
 /* WINDOWS */
 static Window *s_main_window;
 
-/* BACKGROUND */
+/* CANVAS LAYERS */
 static Layer *s_background_layer;
+static Layer *s_weather_layer;
+static Layer *s_battery_layer;
 
 /* TEXT LAYERS */
 static TextLayer *s_time_layer;
@@ -24,13 +26,13 @@ static int s_battery_level;
 static bool s_battery_charging;
 
 /* IMGS */
-static BitmapLayer *s_weather_layer;
-static GBitmap *s_weather_bitmap;
-
-static Layer *s_battery_layer;
+static GDrawCommandImage *s_weather_icons[11];
+static int current = 0;
+static GBitmap *s_weather_icon_default;
 
 /* BUFFERS */
 static char temperature_buffer[8];
+static char current_weather_icon[4];
 
 static void battery_update_proc(Layer *layer, GContext *ctx)
 {
@@ -83,47 +85,57 @@ static void battery_callback(BatteryChargeState state)
   layer_mark_dirty(s_battery_layer);
 }
 
-static void update_icon(char *icon)
+static void weather_icon_update_proc(Layer *layer, GContext *ctx)
 {
-  bool night = false;
-  if (icon[2] == 'n') {
-    night = true;
-  }
-  icon[2] = '\0';
-  int i = atoi(icon);
-  switch(i) {
+  bool night = (current_weather_icon[2] == 'n');
+
+  current_weather_icon[2] = '\0';
+  int i = atoi(current_weather_icon);
+
+  switch (i) {
   case 1:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_01D);
+    current = 1;
+    if (night) current = 10;
     break;
   case 2:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_02D);
+    current = 2;
     break;
   case 3:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_03D);
+    current = 3;
     break;
   case 4:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_04D);
+    current = 4;
     break;
   case 9:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_09D);
+    current = 5;
     break;
   case 10:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_10D);
+    current = 6;
     break;
   case 11:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_11D);
-    break;
+    current = 7;
   case 13:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_13D);
-    break;
+    current = 8;
   case 50:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_50D);
-    break;
+    current = 9;
+  default:
+    current = 0;
+    GRect bitmap_bounds = gbitmap_get_bounds(s_weather_icon_default);
+    bitmap_bounds.origin.x += 22;
+    graphics_context_set_compositing_mode(ctx, GCompOpSet);
+    graphics_draw_bitmap_in_rect(ctx, s_weather_icon_default, bitmap_bounds);
   }
-  bitmap_layer_set_bitmap(s_weather_layer, s_weather_bitmap);
+
+  
   if (night) {
-    night = false;
+    //current += 9;
+    current_weather_icon[2] = 'n';
+  } else {
+    current_weather_icon[2] = 'd';
   }
+  
+  GPoint origin = GPoint(22, 0);
+  gdraw_command_image_draw(ctx, s_weather_icons[current], origin);
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context)
@@ -136,7 +148,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 	     (int) temp_tuple->value->int32);
     text_layer_set_text(s_weather_text_layer, temperature_buffer);
 
-    update_icon(icon_tuple->value->cstring);
+    strcpy(current_weather_icon, icon_tuple->value->cstring);
+    layer_mark_dirty(s_weather_layer);
   }
 }
 
@@ -201,11 +214,10 @@ static void main_window_load(Window *window)
   
   layer_mark_dirty(s_background_layer);
   
-  // TEST IMAGE
-  s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_DEFAULT);
-  s_weather_layer = bitmap_layer_create(GRect(0, 0, bounds.size.w, 100));
-  bitmap_layer_set_bitmap(s_weather_layer, s_weather_bitmap);
-  layer_add_child(window_layer, bitmap_layer_get_layer(s_weather_layer));
+  // WEATHER LAYER
+  s_weather_layer = layer_create(GRect(0, 0, bounds.size.w, 100));
+  layer_set_update_proc(s_weather_layer, weather_icon_update_proc);
+  layer_add_child(window_layer, s_weather_layer);
   
   // TIME LAYER
   s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GAMPLAY_34));
@@ -253,7 +265,15 @@ static void main_window_unload(Window *window)
   text_layer_destroy(s_time_layer);
   text_layer_destroy(s_date_layer);
   text_layer_destroy(s_weather_text_layer);
+
+  for (unsigned int i = 0; i < sizeof(s_weather_icons)/sizeof(s_weather_icons[0]); ++i) {
+    gdraw_command_image_destroy(s_weather_icons[i]);
+  }
+  gbitmap_destroy(s_weather_icon_default);
+  
+  layer_destroy(s_weather_layer);
   layer_destroy(s_background_layer);
+  
   fonts_unload_custom_font(s_time_font);
   fonts_unload_custom_font(s_date_font);
 }
@@ -267,6 +287,21 @@ static void init()
     .load = main_window_load,
     .unload = main_window_unload
   });
+
+  // load draw commands
+  //s_weather_icons[0] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_DEFAULT);
+  s_weather_icons[1] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_01D);
+  s_weather_icons[2] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_02D);
+  s_weather_icons[3] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_03D);
+  s_weather_icons[4] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_04D);
+  s_weather_icons[5] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_09D);
+  s_weather_icons[6] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_10D);
+  s_weather_icons[7] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_11D);
+  s_weather_icons[8] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_13D);
+  s_weather_icons[9] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_50D);
+  s_weather_icons[10] = gdraw_command_image_create_with_resource(RESOURCE_ID_VECTOR_WEATHER_01N);
+
+  s_weather_icon_default = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_DEFAULT);
   
   window_stack_push(s_main_window, true);
   update_time();
@@ -278,7 +313,6 @@ static void init()
   app_message_register_inbox_dropped(inbox_dropped_callback);
   app_message_register_outbox_failed(outbox_failed_callback);
   app_message_register_outbox_sent(outbox_sent_callback);
-
 
   const int inbox_size = 128;
   const int outbox_size = 128;

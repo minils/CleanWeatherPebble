@@ -14,24 +14,6 @@
         "projectType": "native",
         "resources": {
             "media": [
-                {
-                    "file": "images/weather/01d.png",
-                    "name": "IMAGE_WEATHER_01D",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-		{
-                    "file": "images/weather/02d.png",
-                    "name": "IMAGE_WEATHER_02D",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-		{
-                    "file": "images/weather/03d.png",
-                    "name": "IMAGE_WEATHER_03D",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
 		{
                     "file": "images/weather/default.png",
                     "name": "IMAGE_WEATHER_DEFAULT",
@@ -39,40 +21,64 @@
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/04d.png",
-                    "name": "IMAGE_WEATHER_04D",
+		    "file": "images/weather/01d.pdc",
+		    "name": "VECTOR_WEATHER_01D",
+		    "targetPlatforms": null,
+		    "type": "raw"
+		},
+		{
+		    "file": "images/weather/01n.pdc",
+		    "name": "VECTOR_WEATHER_01N",
+		    "targetPlatforms": null,
+		    "type": "raw"
+		},
+		{
+                    "file": "images/weather/02d.pdc",
+                    "name": "VECTOR_WEATHER_02D",
                     "targetPlatforms": null,
-                    "type": "bitmap"
+                    "type": "raw"
                 },
 		{
-                    "file": "images/weather/09d.png",
-                    "name": "IMAGE_WEATHER_09D",
+                    "file": "images/weather/03d.pdc",
+                    "name": "VECTOR_WEATHER_03D",
                     "targetPlatforms": null,
-                    "type": "bitmap"
+                    "type": "raw"
                 },
 		{
-                    "file": "images/weather/10d.png",
-                    "name": "IMAGE_WEATHER_10D",
+                    "file": "images/weather/04d.pdc",
+                    "name": "VECTOR_WEATHER_04D",
                     "targetPlatforms": null,
-                    "type": "bitmap"
+                    "type": "raw"
                 },
 		{
-                    "file": "images/weather/11d.png",
-                    "name": "IMAGE_WEATHER_11D",
+                    "file": "images/weather/09d.pdc",
+                    "name": "VECTOR_WEATHER_09D",
                     "targetPlatforms": null,
-                    "type": "bitmap"
+                    "type": "raw"
                 },
 		{
-                    "file": "images/weather/13d.png",
-                    "name": "IMAGE_WEATHER_13D",
+                    "file": "images/weather/10d.pdc",
+                    "name": "VECTOR_WEATHER_10D",
                     "targetPlatforms": null,
-                    "type": "bitmap"
+                    "type": "raw"
                 },
 		{
-                    "file": "images/weather/50d.png",
-                    "name": "IMAGE_WEATHER_50D",
+                    "file": "images/weather/11d.pdc",
+                    "name": "VECTOR_WEATHER_11D",
                     "targetPlatforms": null,
-                    "type": "bitmap"
+                    "type": "raw"
+                },
+		{
+                    "file": "images/weather/13d.pdc",
+                    "name": "VECTOR_WEATHER_13D",
+                    "targetPlatforms": null,
+                    "type": "raw"
+                },
+		{
+                    "file": "images/weather/50d.pdc",
+                    "name": "VECTOR_WEATHER_50D",
+                    "targetPlatforms": null,
+                    "type": "raw"
                 },
                 {
                     "characterRegex": "[a-zA-Z0-9. ]",
@@ -92,7 +98,11 @@
         },
         "sdkVersion": "3",
         "targetPlatforms": [
-            "aplite"
+            "aplite",
+            "basalt",
+            "chalk",
+            "diorite",
+            "emery"     
         ],
         "uuid": "16384b99-283e-41bd-bf6b-14c8027cc16c",
         "watchapp": {
