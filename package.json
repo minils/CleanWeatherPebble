@@ -14,27 +14,21 @@
         "projectType": "native",
         "resources": {
             "media": [
-		{
-                    "file": "images/battery.png",
-                    "name": "IMAGE_BATTERY",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
                 {
-                    "file": "images/weather/clear-day.png",
-                    "name": "IMAGE_WEATHER_CLEAR_DAY",
+                    "file": "images/weather/01d.png",
+                    "name": "IMAGE_WEATHER_01D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/clear-night.png",
-                    "name": "IMAGE_WEATHER_CLEAR_NIGHT",
+                    "file": "images/weather/02d.png",
+                    "name": "IMAGE_WEATHER_02D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/cloudy.png",
-                    "name": "IMAGE_WEATHER_CLOUDY",
+                    "file": "images/weather/03d.png",
+                    "name": "IMAGE_WEATHER_03D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
@@ -45,44 +39,38 @@
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/fog.png",
-                    "name": "IMAGE_WEATHER_FOG",
+                    "file": "images/weather/04d.png",
+                    "name": "IMAGE_WEATHER_04D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/partly-cloudy-day.png",
-                    "name": "IMAGE_WEATHER_PARTLY_CLOUDY_DAY",
+                    "file": "images/weather/09d.png",
+                    "name": "IMAGE_WEATHER_09D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/partly-cloudy-night.png",
-                    "name": "IMAGE_WEATHER_PARTLY_CLOUDY_NIGHT",
+                    "file": "images/weather/10d.png",
+                    "name": "IMAGE_WEATHER_10D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/rain.png",
-                    "name": "IMAGE_WEATHER_RAIN",
+                    "file": "images/weather/11d.png",
+                    "name": "IMAGE_WEATHER_11D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/sleet.png",
-                    "name": "IMAGE_WEATHER_SLEET",
+                    "file": "images/weather/13d.png",
+                    "name": "IMAGE_WEATHER_13D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
 		{
-                    "file": "images/weather/snow.png",
-                    "name": "IMAGE_WEATHER_SNOW",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-		{
-                    "file": "images/weather/wind.png",
-                    "name": "IMAGE_WEATHER_WIND",
+                    "file": "images/weather/50d.png",
+                    "name": "IMAGE_WEATHER_50D",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
