@@ -11,11 +11,13 @@ static char s_temperature_buffer[8];
 
 static GRect s_weather_layer_in;
 static GRect s_weather_layer_off;
+static bool s_weather_layer_visible;
 
 /* FUNCTIONS */
 
 static void weather_icon_update_proc(Layer *layer, GContext *ctx);
 static void load_persist_string(const uint32_t key, char *buffer, char *default_value);
+static void weather_layer_animate();
 
 void weather_received_data(char* icon, int temperature);
 void weather_load(Layer*, int width);

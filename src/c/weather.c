@@ -3,7 +3,7 @@
 
 static void weather_icon_update_proc(Layer *layer, GContext *ctx)
 {
-    bool night = false;
+  bool night = false;
   if (s_current_weather_icon[2] == 'n') {
     night = true;
   }
@@ -55,6 +55,41 @@ static void weather_icon_update_proc(Layer *layer, GContext *ctx)
   }
 }
 
+static void weather_layer_animation_started(Animation *animation, void *context)
+{
+}
+
+static void weather_layer_animation_stopped(Animation *animation, bool finished, void *context)
+{
+  layer_mark_dirty(s_weather_layer);
+  PropertyAnimation *prop_anim = property_animation_create_layer_frame(
+       s_weather_layer, &s_weather_layer_off, &s_weather_layer_in);
+  Animation *anim = property_animation_get_animation(prop_anim);
+  const int delay_ms = 500;
+  const int duration_ms = 500;
+  animation_set_curve(anim, AnimationCurveEaseOut);
+  animation_set_delay(anim, delay_ms);
+  animation_set_duration(anim, duration_ms);
+  animation_schedule(anim);
+}
+
+static void weather_layer_animate()
+{
+  PropertyAnimation *prop_anim = property_animation_create_layer_frame(
+       s_weather_layer, &s_weather_layer_in, &s_weather_layer_off);
+  Animation *anim = property_animation_get_animation(prop_anim);
+  const int delay_ms = 500;
+  const int duration_ms = 500;
+  animation_set_curve(anim, AnimationCurveEaseOut);
+  animation_set_delay(anim, delay_ms);
+  animation_set_duration(anim, duration_ms);
+  animation_set_handlers(anim, (AnimationHandlers) {
+	.started = weather_layer_animation_started,
+	.stopped = weather_layer_animation_stopped
+  }, NULL);
+  animation_schedule(anim);
+}
+
 void weather_received_data(char* icon, int temperature)
 {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Received temperature: %d", temperature);
@@ -64,13 +99,14 @@ void weather_received_data(char* icon, int temperature)
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Received icon: %s", icon);
   strcpy(s_current_weather_icon, icon);
   persist_write_string(key_weather_icon, s_current_weather_icon);
-  layer_mark_dirty(s_weather_layer);
+  weather_layer_animate();
 }
 
 void weather_load(Layer *window_layer, int width)
 {
   s_weather_layer_in = GRect(0, 0, width/2, 100);
-  s_weather_layer_off = GRect(0, 0, width/2, 100);
+  s_weather_layer_off = GRect(-width/2, 0, width/2, 100);
+  s_weather_layer_visible = false;
   
   s_weather_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GAMPLAY_20));
   
