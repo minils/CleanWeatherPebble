@@ -69,9 +69,12 @@ void weather_received_data(char* icon, int temperature)
 
 void weather_load(Layer *window_layer, int width)
 {
+  s_weather_layer_in = GRect(0, 0, width/2, 100);
+  s_weather_layer_off = GRect(0, 0, width/2, 100);
+  
   s_weather_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GAMPLAY_20));
   
-  s_weather_layer = layer_create(GRect(0, 0, width, 100));
+  s_weather_layer = layer_create(s_weather_layer_in);
   layer_set_update_proc(s_weather_layer, weather_icon_update_proc);
   layer_add_child(window_layer, s_weather_layer);
   layer_mark_dirty(s_weather_layer);

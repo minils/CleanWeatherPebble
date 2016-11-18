@@ -9,6 +9,9 @@ static GFont s_weather_font;
 static char s_current_weather_icon[4];
 static char s_temperature_buffer[8];
 
+static GRect s_weather_layer_in;
+static GRect s_weather_layer_off;
+
 /* FUNCTIONS */
 
 static void weather_icon_update_proc(Layer *layer, GContext *ctx);
