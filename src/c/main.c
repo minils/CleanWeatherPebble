@@ -128,9 +128,15 @@ static void weather_icon_update_proc(Layer *layer, GContext *ctx)
   }
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Updated weather layer with: %s", s_current_weather_icon);
   GRect bitmap_bounds = gbitmap_get_bounds(s_weather_bitmap);
-  bitmap_bounds.origin.x += 22;
+  bitmap_bounds.origin.x += 14;
+  bitmap_bounds.origin.y += 25;
   graphics_context_set_compositing_mode(ctx, GCompOpSet);
   graphics_draw_bitmap_in_rect(ctx, s_weather_bitmap, bitmap_bounds);
+  /// for testing
+  bitmap_bounds.origin.x += 65;
+  graphics_draw_bitmap_in_rect(ctx, s_weather_bitmap, bitmap_bounds);
+  ///
+  
   if (night) {
     night = false;
   }
