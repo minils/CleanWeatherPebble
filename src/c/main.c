@@ -27,8 +27,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *icon_tuple = dict_find(iterator, MESSAGE_KEY_ICON);
 
   if (temp_tuple && icon_tuple) {
-    weather_received_temperature((int) temp_tuple->value->int32);
-    weather_received_icon(icon_tuple->value->cstring);
+    weather_received_data(icon_tuple->value->cstring, (int) temp_tuple->value->int32);
   }
 }
 

@@ -14,8 +14,7 @@ static char s_temperature_buffer[8];
 static void weather_icon_update_proc(Layer *layer, GContext *ctx);
 static void load_persist_string(const uint32_t key, char *buffer, char *default_value);
 
-void weather_received_temperature(int temperature);
-void weather_received_icon(char *icon);
+void weather_received_data(char* icon, int temperature);
 void weather_load(Layer*, int width);
 void weather_unload();
 void weather_init();
