@@ -1,10 +1,12 @@
 #include <pebble.h>
+#include "storage_keys.h"
 
 /* WINDOWS */
 static Window *s_main_window;
 
-/* BACKGROUND */
+/* CANVAS LAYERS */
 static Layer *s_background_layer;
+static Layer *s_weather_layer;
 
 /* TEXT LAYERS */
 static TextLayer *s_time_layer;
@@ -16,21 +18,21 @@ static GFont s_time_font;
 static GFont s_date_font;
 
 /* MISC */
-static GRect bounds;
-static char *sys_locale;
+static GRect s_bounds;
+static char *s_sys_locale;
 
 /* BATTERY */
 static int s_battery_level;
 static bool s_battery_charging;
 
 /* IMGS */
-static BitmapLayer *s_weather_layer;
 static GBitmap *s_weather_bitmap;
 
 static Layer *s_battery_layer;
 
 /* BUFFERS */
-static char temperature_buffer[8];
+static char s_temperature_buffer[8];
+static char s_current_weather_icon[4];
 
 static void battery_update_proc(Layer *layer, GContext *ctx)
 {
@@ -83,14 +85,16 @@ static void battery_callback(BatteryChargeState state)
   layer_mark_dirty(s_battery_layer);
 }
 
-static void update_icon(char *icon)
+static void weather_icon_update_proc(Layer *layer, GContext *ctx)
 {
   bool night = false;
-  if (icon[2] == 'n') {
+  if (s_current_weather_icon[2] == 'n') {
     night = true;
   }
-  icon[2] = '\0';
-  int i = atoi(icon);
+  char tmp[2];
+  tmp[0] = s_current_weather_icon[0];
+  tmp[1] = s_current_weather_icon[1];
+  int i = atoi(tmp);
   switch(i) {
   case 1:
     s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_01D);
@@ -119,8 +123,14 @@ static void update_icon(char *icon)
   case 50:
     s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_50D);
     break;
+  default:
+    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_DEFAULT);
   }
-  bitmap_layer_set_bitmap(s_weather_layer, s_weather_bitmap);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Updated weather layer with: %s", s_current_weather_icon);
+  GRect bitmap_bounds = gbitmap_get_bounds(s_weather_bitmap);
+  bitmap_bounds.origin.x += 22;
+  graphics_context_set_compositing_mode(ctx, GCompOpSet);
+  graphics_draw_bitmap_in_rect(ctx, s_weather_bitmap, bitmap_bounds);
   if (night) {
     night = false;
   }
@@ -132,11 +142,14 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *icon_tuple = dict_find(iterator, MESSAGE_KEY_ICON);
 
   if (temp_tuple && icon_tuple) {
-    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d C",
+    snprintf(s_temperature_buffer, sizeof(s_temperature_buffer), "%d °",
 	     (int) temp_tuple->value->int32);
-    text_layer_set_text(s_weather_text_layer, temperature_buffer);
+    text_layer_set_text(s_weather_text_layer, s_temperature_buffer);
 
-    update_icon(icon_tuple->value->cstring);
+    strcpy(s_current_weather_icon, icon_tuple->value->cstring);
+    persist_write_string(key_weather_icon, s_current_weather_icon);
+    layer_mark_dirty(s_weather_layer);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Received: %s", s_current_weather_icon);
   }
 }
 
@@ -183,33 +196,31 @@ static void tick_handler(struct tm *ticktime, TimeUnits  units_changed)
 static void background_update_proc(Layer *layer, GContext *ctx)
 {
   graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, bounds, 0, GCornerNone);
+  graphics_fill_rect(ctx, s_bounds, 0, GCornerNone);
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_rect(ctx, bounds, 10, GCornersAll);
+  graphics_fill_rect(ctx, s_bounds, 10, GCornersAll);
 }
 
 static void main_window_load(Window *window)
 {
   Layer *window_layer = window_get_root_layer(window);
-  bounds = layer_get_bounds(window_layer);
+  s_bounds = layer_get_bounds(window_layer);
   
   // BACKGROUND LAYER
-  s_background_layer = layer_create(bounds);
+  s_background_layer = layer_create(s_bounds);
   layer_set_update_proc(s_background_layer, background_update_proc);
-  
   layer_add_child(window_layer, s_background_layer);
-  
   layer_mark_dirty(s_background_layer);
   
-  // TEST IMAGE
-  s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_DEFAULT);
-  s_weather_layer = bitmap_layer_create(GRect(0, 0, bounds.size.w, 100));
-  bitmap_layer_set_bitmap(s_weather_layer, s_weather_bitmap);
-  layer_add_child(window_layer, bitmap_layer_get_layer(s_weather_layer));
+  // WEATHER LAYER
+  s_weather_layer = layer_create(GRect(0, 0, s_bounds.size.w, 100));
+  layer_set_update_proc(s_weather_layer, weather_icon_update_proc);
+  layer_add_child(window_layer, s_weather_layer);
+  layer_mark_dirty(s_weather_layer);
   
   // TIME LAYER
   s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GAMPLAY_34));
-  s_time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(106, 100), bounds.size.w, 50));
+  s_time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(106, 100), s_bounds.size.w, 50));
   
   text_layer_set_background_color(s_time_layer, GColorClear);
   text_layer_set_text_color(s_time_layer, GColorBlack);
@@ -222,7 +233,7 @@ static void main_window_load(Window *window)
   
   // DATE LAYER
   s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GAMPLAY_20));
-  s_date_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(146, 140), bounds.size.w, 50));
+  s_date_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(146, 140), s_bounds.size.w, 50));
   
   text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_color(s_date_layer, GColorBlack);
@@ -232,7 +243,7 @@ static void main_window_load(Window *window)
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   // WEATHER TEXT LAYER
-  s_weather_text_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(125, 2), bounds.size.w, 25));
+  s_weather_text_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(125, 2), s_bounds.size.w, 25));
   text_layer_set_background_color(s_weather_text_layer, GColorClear);
   text_layer_set_text_color(s_weather_text_layer, GColorBlack);
   text_layer_set_text_alignment(s_weather_text_layer, GTextAlignmentCenter);
@@ -253,14 +264,26 @@ static void main_window_unload(Window *window)
   text_layer_destroy(s_time_layer);
   text_layer_destroy(s_date_layer);
   text_layer_destroy(s_weather_text_layer);
+
+  gbitmap_destroy(s_weather_bitmap);
   layer_destroy(s_background_layer);
+  layer_destroy(s_weather_layer);
+  
   fonts_unload_custom_font(s_time_font);
   fonts_unload_custom_font(s_date_font);
 }
 
 static void init()
 {
-  sys_locale = setlocale(LC_ALL, "");
+  if (persist_read_string(key_weather_icon, s_current_weather_icon,
+			  sizeof(s_current_weather_icon)) == E_DOES_NOT_EXIST) {
+    strcpy(s_current_weather_icon, "00d");
+    persist_write_string(key_weather_icon, s_current_weather_icon);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Loaded %s from persist", s_current_weather_icon);
+  }
+
+  s_sys_locale = setlocale(LC_ALL, "");
   s_main_window = window_create();
   
   window_set_window_handlers(s_main_window, (WindowHandlers) {
