@@ -1,1 +1,1 @@
-pebble build && pebble install --log --emulator aplite
+pebble build && pebble install --log --emulator ddiorite
