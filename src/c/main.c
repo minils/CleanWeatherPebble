@@ -1,7 +1,7 @@
 #include <pebble.h>
 
-#include "weather.h"
-#include "battery.h"
+#include "modules/weather.h"
+#include "modules/battery.h"
 
 /* WINDOWS */
 static Window *s_main_window;
