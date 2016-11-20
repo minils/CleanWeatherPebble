@@ -12,35 +12,40 @@ static void weather_icon_update_proc(Layer *layer, GContext *ctx)
   tmp[1] = s_current_weather_icon[1];
   int i = atoi(tmp);
   switch(i) {
-  case 1:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_01D);
-    break;
-  case 2:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_02D);
-    break;
-  case 3:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_03D);
-    break;
-  case 4:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_04D);
-    break;
-  case 9:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_09D);
-    break;
-  case 10:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_10D);
-    break;
-  case 11:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_11D);
-    break;
-  case 13:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_13D);
-    break;
-  case 50:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_50D);
-    break;
-  default:
-    s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_DEFAULT);
+    case 1:
+      if (night) {
+	s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_01D);
+      } else {
+	s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_01D);
+      }
+      break;
+    case 2:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_02D);
+      break;
+    case 3:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_03D);
+      break;
+    case 4:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_04D);
+      break;
+    case 9:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_09D);
+      break;
+    case 10:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_10D);
+      break;
+    case 11:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_11D);
+      break;
+    case 13:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_13D);
+      break;
+    case 50:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_50D);
+      break;
+    default:
+      s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_WEATHER_DEFAULT);
+      break;
   }
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Updated weather layer with: %s", s_current_weather_icon);
   GRect bitmap_bounds = gbitmap_get_bounds(s_weather_bitmap);
@@ -88,6 +93,11 @@ static void weather_layer_animate()
 	.stopped = weather_layer_animation_stopped
   }, NULL);
   animation_schedule(anim);
+}
+
+bool weather_need_update(struct tm *ticktime)
+{
+  
 }
 
 void weather_received_data(char* icon, int temperature)
@@ -144,4 +154,6 @@ void weather_init()
 {
   load_persist_string(key_weather_icon, s_current_weather_icon, "00d");
   load_persist_string(key_weather_temperature, s_temperature_buffer, "...");
+  s_last_update = 0;
+  persist_read_data(key_weather_last_update, &s_last_update, sizeof(s_last_update));
 }

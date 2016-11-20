@@ -60,10 +60,12 @@ static void update_time()
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Updated time");
 }
 
-static void tick_handler(struct tm *ticktime, TimeUnits  units_changed)
+static void tick_handler(struct tm *ticktime, TimeUnits units_changed)
 {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "tick_handler()");
   update_time();
-  if (ticktime->tm_min % 30 == 0) {
+  if (ticktime->tm_min % 30 == 0 && weather_need_update(ticktime)) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "tick_handler() -> %d", ticktime);
     DictionaryIterator *iter;
     app_message_outbox_begin(&iter);
     dict_write_uint8(iter, 0, 0);
